@@ -102,7 +102,7 @@ Podemos observar que o valor P10 está muito abaixo da normalidade, logo faz se 
 
 Novamente o valor P10 está muito abaixo da normalidade, P90 e P50 demonstram uma previsão negativa para a ação, o que parece coerente com o mercado atual.
 
-    ![alt text](img/alpa4.png)
+![alt text](img/alpa4.png)
 
 -   BBDC4.SA
 
