@@ -1,47 +1,117 @@
-# 📊 Previsão de Estoque Inteligente na AWS com [SageMaker Canvas](https://aws.amazon.com/pt/sagemaker/canvas/)
+# 📊 Previsão de cotações na bolsa de valores Inteligente na AWS com [SageMaker Canvas](https://aws.amazon.com/pt/sagemaker/canvas/)
 
-Bem-vindo ao desafio de projeto "Previsão de Estoque Inteligente na AWS com SageMaker Canvas. Neste Lab DIO, você aprenderá a usar o SageMaker Canvas para criar previsões de estoque baseadas em Machine Learning (ML). Siga os passos abaixo para completar o desafio!
+Bem-vindo ao projeto "Previsão de cotações na bolsa de valores Inteligente na AWS com SageMaker Canvas. Siga os passos abaixo para realizar a predição da bolsa de valores!
 
-## 📋 Pré-requisitos
+## 📋 Faça você também!
+Use o arquivo dataset_mercado_financeiro.py em Python para baixar dados históricos de ações de uma determinada ticker usando a biblioteca yfinance. O programa obtém dados diários de 365 dias e os salva em um arquivo CSV. Os dados retornados possuem as seguintes colunas: Date, Open, High, Low, Close, Volume, Dividends, Stock Splits
 
-Antes de começar, certifique-se de ter uma conta na AWS. Se precisar de ajuda para criar sua conta, confira nosso repositório [AWS Cloud Quickstart](https://github.com/digitalinnovationone/aws-cloud-quickstart).
+Necessário:
+    Python 3.8 > instalado em seu sistema.
+    Biblioteca yfinance instalada.
 
+Se preferir, instale as dependências necessárias usando o arquivo requirements.txt:
 
-## 🎯 Objetivos Deste Desafio de Projeto (Lab)
-
-![image](https://github.com/digitalinnovationone/lab-aws-sagemaker-canvas-estoque/assets/730492/72f5c21f-5562-491e-aa42-2885a3184650)
-
-- Dê um fork neste projeto e reescreva este `README.md`. Sinta-se à vontade para detalhar todo o processo de criação do seu Modelo de ML para uma "Previsão de Estoque Inteligente".
-- Para isso, siga o [passo a passo] descrito a seguir e evolua as suas habilidades em ML no-code com o Amazon SageMaker Canvas.
-- Ao concluir, envie a URL do seu repositório com a solução na plataforma da DIO.
+Treine utilizando o SageMaker Canvas.
 
 
-## 🚀 Passo a Passo
+## 🚀 Exemplo e análise de modelo preditivo para os ticker's VALE3.SA, ALPA4.SA  e BBDC4.SA (Vale, Alpargatas e Banco Bradesco)
 
-### 1. Selecionar Dataset
+### 1. Limpeza do dataset
 
--   Navegue até a pasta `datasets` deste repositório. Esta pasta contém os datasets que você poderá escolher para treinar e testar seu modelo de ML. Sinta-se à vontade para gerar/enriquecer seus próprios datasets, quanto mais você se engajar, mais relevante esse projeto será em seu portfólio.
--   Escolha o dataset que você usará para treinar seu modelo de previsão de estoque.
--   Faça o upload do dataset no SageMaker Canvas.
+Como é conhecido, não houve splits em nenhuma das empresas neste último ano. Desta maneida, esta coluna foi eliminada do dataset, visando a geração de um melhor modelo mais clean. 
 
-### 2. Construir/Treinar
+![alt text](<img/drop.png>)
 
--   No SageMaker Canvas, importe o dataset que você selecionou.
--   Configure as variáveis de entrada e saída de acordo com os dados.
--   Inicie o treinamento do modelo. Isso pode levar algum tempo, dependendo do tamanho do dataset.
+Também foi necessário alterar os nomes de algumas colunas, como por exemplo Open, Close, dentre outros devido ao fato destas palavras serem reservadas pelo sistema.
 
-### 3. Analisar
 
--   Após o treinamento, examine as métricas de performance do modelo.
--   Verifique as principais características que influenciam as previsões.
--   Faça ajustes no modelo se necessário e re-treine até obter um desempenho satisfatório.
+Não havia nenhuma coluna incompleta, logo não foi necessário tratar isso.
 
-### 4. Prever
+### 2. Model overview
 
--   Use o modelo treinado para fazer previsões de estoque.
--   Exporte os resultados e analise as previsões geradas.
--   Documente suas conclusões e qualquer insight obtido a partir das previsões.
+Foi utilizado o Time series forecasting e como target a coluna High (cotação máxima da ação no dia) e, como time stamp, a coluna Date. 
 
-## 🤔 Dúvidas?
+A opção de holiday foi utilizada, já que é conhecido pelo mercado que exite alteração no volume de movimentações na bolsa de valores nos dias de feriado, possivelmente alterando o valor da cotação, já que com a maior eu menor demanda o preço é naturalmente alterado.
 
-Esperamos que esta experiência tenha sido enriquecedora e que você tenha aprendido mais sobre Machine Learning aplicado a problemas reais. Se tiver alguma dúvida, não hesite em abrir uma issue neste repositório ou entrar em contato com a equipe da DIO.
+Para um primeiro teste foi utilizado o quick build.
+
+![alt text](<img/model.png>)
+
+### 3. Analises
+
+-   A perda média ponderada de quantis (wQL) avalia a previsão como um todo calculando a média da precisão em pontos de distribuição específicos chamados quantis para os quantis P10, P50 e P90. Um valor mais baixo indica um modelo mais preciso.
+
+    R = 0.127
+
+
+-   O erro percentual médio absoluto (MAPE) é o erro percentual (diferença percentual entre o valor médio previsto e o valor real) calculado em média em todos os pontos de tempo. Um valor menor indica um modelo mais preciso com MAPE=0 como um modelo perfeito e sem erros.
+
+    R = 0.106
+
+
+-   O erro percentual absoluto ponderado (WAPE) mede o desvio geral dos valores previstos em relação aos valores observados e é definido pela soma do erro absoluto normalizado pela soma da meta absoluta. Um valor mais baixo indica um modelo mais preciso com WAPE=0 como um modelo perfeito e sem erros.
+    
+    R = 0.168
+
+
+-   Root Mean Square Error (RMSE) é a raiz quadrada dos erros quadráticos médios. Um RMSE mais baixo indica um modelo mais preciso com RMSE=0 como um modelo perfeito e sem erros.
+
+    R = 7.225
+
+
+-   Erro Médio Absoluto em Escala (MASE) é a média do erro absoluto da previsão normalizada pelo erro médio absoluto de um método simples de previsão de linha de base. Um valor mais baixo indica um modelo mais preciso com MASE < 1 como um modelo estimado como melhor que a linha de base e um MASE > 1 como um modelo estimado como pior que a linha de base.
+
+    R = 0.292
+
+
+-   Impacto das colunas
+
+    Holiday_BR 31.68%
+
+    Close 13.87%
+
+    Volume 8.72%
+
+    Open 6.04%
+
+    Low 4.67%
+
+    Dividendos 0.11%
+
+### 4. Previção das cotações
+
+-   VALE3.SA
+    
+    P90 = R$62.236
+
+    P50 = R$54.674
+
+    P10 = R$10.006
+
+    ![alt text](img/vale3.png)
+
+Podemos observar que o valor P10 está muito abaixo da normalidade, logo faz se necessário uma melhora do modelo. O valor P90 e P50 parecem ser corretos, principalmente pela análise dos novos dividendos de VALE3 
+
+-   ALPA4.SA
+
+    P90 = R$9.851
+
+    P50 = R$8.7
+
+    P10 = R$1.41
+
+Novamente o valor P10 está muito abaixo da normalidade, P90 e P50 demonstram uma previsão negativa para a ação, o que parece coerente com o mercado atual.
+
+    ![alt text](img/alpa4.png)
+
+-   BBDC4.SA
+
+    P90 = R$13.416
+
+    P50 = R$11.13
+
+    P10 = R$1.257
+
+    ![alt text](img/bbdc4.png)
+
+Aqui também o P10 está muito abaixo, P90 mostra uma predição positiva e coerente com o mercado.
